@@ -1,0 +1,1373 @@
+[gd_scene load_steps=76 format=2]
+
+[ext_resource path="res://textures/hZZ7X7.png" type="Texture" id=1]
+[ext_resource path="res://textures/multiplayer.png" type="Texture" id=2]
+[ext_resource path="res://textures/charcustom.png" type="Texture" id=3]
+[ext_resource path="res://textures/studio.png" type="Texture" id=4]
+[ext_resource path="res://textures/settings.png" type="Texture" id=5]
+[ext_resource path="res://fonts/ERASDEMI.TTF" type="DynamicFontData" id=6]
+[ext_resource path="res://scenes/main.gd" type="Script" id=7]
+[ext_resource path="res://fonts/font.tres" type="DynamicFont" id=8]
+[ext_resource path="res://scenes/selectfocus.tres" type="StyleBox" id=9]
+[ext_resource path="res://models/roblox.obj" type="ArrayMesh" id=10]
+[ext_resource path="res://textures/sky/null_plainsky512_up.jpg" type="Texture" id=11]
+[ext_resource path="res://assets/simple_skybox/Skybox.tscn" type="PackedScene" id=12]
+[ext_resource path="res://textures/sky/null_plainsky512_ft.jpg" type="Texture" id=13]
+[ext_resource path="res://textures/sky/null_plainsky512_dn_rotated(6).jpg" type="Texture" id=14]
+[ext_resource path="res://textures/sky/null_plainsky512_lf.jpg" type="Texture" id=15]
+[ext_resource path="res://textures/sky/null_plainsky512_rt.jpg" type="Texture" id=16]
+[ext_resource path="res://textures/sky/null_plainsky512_bk.jpg" type="Texture" id=17]
+[ext_resource path="res://textures/2006Face.png" type="Texture" id=18]
+
+[sub_resource type="Shader" id=31]
+code = "shader_type canvas_item;
+
+uniform vec4 BackColor : hint_color = vec4(0.0, 0.4, 0.58, 1.0);
+uniform vec4 CloudColor : hint_color = vec4(0.18, 0.70, 0.87, 1.0);
+uniform float speed : hint_range(0.0, 5.0) = 0.1;
+
+const float TAU = 6.28318530718;
+
+float Func(float pX)
+{
+	return 0.6*(0.5*sin(0.1*pX) + 0.5*sin(0.553*pX) + 0.7*sin(1.2*pX));
+}
+
+
+float FuncR(float pX)
+{
+	return 0.5 + 0.25*(1.0 + sin(mod(40.0*pX, TAU)));
+}
+
+
+float Layer(vec2 pQ, float pT)
+{
+	vec2 Qt = 3.5*pQ;
+	pT *= 0.5;
+	Qt.x += pT;
+
+	float Xi = floor(Qt.x);
+	float Xf = Qt.x - Xi -0.5;
+
+	vec2 C;
+	float Yi;
+	float D = 1.0 - step(Qt.y,  Func(Qt.x));
+
+	// Disk:
+	Yi = Func(Xi + 0.5);
+	C = vec2(Xf, Qt.y - Yi );
+	D =  min(D, length(C) - FuncR(Xi+ pT/80.0));
+
+	// Previous disk:
+	Yi = Func(Xi+1.0 + 0.5);
+	C = vec2(Xf-1.0, Qt.y - Yi );
+	D =  min(D, length(C) - FuncR(Xi+1.0+ pT/80.0));
+
+	// Next Disk:
+	Yi = Func(Xi-1.0 + 0.5);
+	C = vec2(Xf+1.0, Qt.y - Yi );
+	D =  min(D, length(C) - FuncR(Xi-1.0+ pT/80.0));
+
+	return min(1.0, D);
+}
+
+void fragment() {
+	//vec2 uv = 8.0 * (SCREEN_UV - UV * 2.0);
+	vec2 uv = 3.0 * (SCREEN_UV - UV * 2.0);
+
+	// Render:
+	vec3 Color= BackColor.rgb;
+	for(float J = 0.0; J <= 1.0; J += 0.2)
+	{
+		// Cloud Layer:
+		float Lt =  TIME * speed * (0.5  + 2.0 * J) * (1.0 + 0.1 * sin(226.0 * J)) + 17.0 * J;
+		vec2 Lp = vec2(0.0, 0.3 + 1.5 * ( J - 0.5));
+		float L = Layer(uv + Lp, Lt);
+		// Blur and color:
+		float Blur = 4.0 * (0.5 * abs(2.0 - 5.0 * J)) / (11.0 - 5.0 * J);
+		float V = mix( 0.0, 1.0, 1.0 - smoothstep( 0.0, 0.01 +0.2 * Blur, L ) );
+		vec3 Lc=  mix(CloudColor.rgb, vec3(1.0), J);
+		Color =mix(Color, Lc,  V);
+	}
+	COLOR = vec4(Color,1.);
+}"
+
+[sub_resource type="ShaderMaterial" id=32]
+shader = SubResource( 31 )
+shader_param/BackColor = Color( 0.137255, 0.14902, 0.258824, 1 )
+shader_param/CloudColor = Color( 0.141176, 0.0784314, 0.368627, 1 )
+shader_param/speed = 1.08
+
+[sub_resource type="Gradient" id=6]
+colors = PoolColorArray( 0, 0, 0, 1, 0.175327, 0.151245, 0.921875, 1 )
+
+[sub_resource type="GradientTexture" id=7]
+gradient = SubResource( 6 )
+width = 1024
+
+[sub_resource type="Animation" id=5]
+resource_name = "anim"
+length = 4.0
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Control/Logo:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector2( 28, -184 ), Vector2( 28, -178 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("../Main/Menu/ItemList:custom_styles/selected_focus:modulate_color")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 2 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0.392157 ), Color( 1, 1, 1, 0.117647 ) ]
+}
+
+[sub_resource type="DynamicFont" id=29]
+size = 14
+font_data = ExtResource( 6 )
+
+[sub_resource type="DynamicFont" id=10]
+size = 25
+font_data = ExtResource( 6 )
+
+[sub_resource type="DynamicFont" id=36]
+font_data = ExtResource( 6 )
+
+[sub_resource type="StyleBoxFlat" id=66]
+bg_color = Color( 0.121569, 0.0823529, 0.2, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="DynamicFont" id=67]
+font_data = ExtResource( 6 )
+
+[sub_resource type="StyleBoxFlat" id=8]
+bg_color = Color( 0.0666667, 0.0470588, 0.215686, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="DynamicFont" id=11]
+size = 21
+font_data = ExtResource( 6 )
+
+[sub_resource type="StyleBoxFlat" id=9]
+bg_color = Color( 0.0666667, 0.0470588, 0.215686, 1 )
+
+[sub_resource type="StyleBoxEmpty" id=17]
+
+[sub_resource type="StyleBoxEmpty" id=18]
+
+[sub_resource type="StyleBoxEmpty" id=15]
+
+[sub_resource type="Theme" id=16]
+HScrollBar/icons/decrement = null
+HScrollBar/icons/decrement_highlight = null
+HScrollBar/icons/decrement_pressed = null
+HScrollBar/icons/increment = null
+HScrollBar/icons/increment_highlight = null
+HScrollBar/icons/increment_pressed = null
+HScrollBar/styles/grabber = null
+HScrollBar/styles/grabber_highlight = null
+HScrollBar/styles/grabber_pressed = null
+HScrollBar/styles/scroll = SubResource( 17 )
+HScrollBar/styles/scroll_focus = SubResource( 18 )
+VScrollBar/styles/scroll = SubResource( 15 )
+
+[sub_resource type="DynamicFont" id=13]
+extra_spacing_top = -5
+extra_spacing_char = -1
+font_data = ExtResource( 6 )
+
+[sub_resource type="StyleBoxFlat" id=14]
+bg_color = Color( 0.0431373, 0.0352941, 0.160784, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="DynamicFont" id=21]
+size = 25
+font_data = ExtResource( 6 )
+
+[sub_resource type="StyleBoxFlat" id=20]
+bg_color = Color( 0.235294, 0.258824, 0.415686, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="StyleBoxFlat" id=19]
+bg_color = Color( 0.0666667, 0.0392157, 0.152941, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="StyleBoxFlat" id=28]
+bg_color = Color( 0.34902, 0.333333, 0.517647, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="StyleBoxFlat" id=25]
+bg_color = Color( 0.0588235, 0.0352941, 0.152941, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="StyleBoxFlat" id=26]
+bg_color = Color( 0.34902, 0.333333, 0.517647, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="StyleBoxFlat" id=27]
+bg_color = Color( 0.054902, 0.0313726, 0.12549, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="StyleBoxFlat" id=30]
+bg_color = Color( 0.0352941, 0.0235294, 0.113725, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="DynamicFont" id=61]
+size = 14
+font_data = ExtResource( 6 )
+
+[sub_resource type="StyleBoxFlat" id=43]
+bg_color = Color( 0.0470588, 0.027451, 0.243137, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="SpatialMaterial" id=42]
+albedo_color = Color( 0.0509804, 0.411765, 0.67451, 1 )
+
+[sub_resource type="SpatialMaterial" id=44]
+albedo_color = Color( 0.960784, 0.803922, 0.188235, 1 )
+
+[sub_resource type="SpatialMaterial" id=45]
+albedo_color = Color( 0.294118, 0.592157, 0.294118, 1 )
+
+[sub_resource type="SpatialMaterial" id=46]
+albedo_color = Color( 0.960784, 0.803922, 0.188235, 1 )
+
+[sub_resource type="SpatialMaterial" id=47]
+albedo_color = Color( 0.960784, 0.803922, 0.188235, 1 )
+
+[sub_resource type="SpatialMaterial" id=48]
+albedo_color = Color( 0.294118, 0.592157, 0.294118, 1 )
+
+[sub_resource type="PlaneMesh" id=49]
+size = Vector2( 1.2, 1.2 )
+
+[sub_resource type="SpatialMaterial" id=50]
+flags_transparent = true
+albedo_texture = ExtResource( 18 )
+
+[sub_resource type="SpatialMaterial" id=38]
+albedo_color = Color( 0.282353, 0.282353, 0.282353, 1 )
+
+[sub_resource type="CubeMesh" id=39]
+material = SubResource( 38 )
+
+[sub_resource type="ProceduralSky" id=40]
+sky_top_color = Color( 1, 1, 1, 1 )
+
+[sub_resource type="Environment" id=41]
+background_mode = 2
+background_sky = SubResource( 40 )
+
+[sub_resource type="ViewportTexture" id=37]
+viewport_path = NodePath("Main/CharCus/Control/Viewport")
+
+[sub_resource type="DynamicFont" id=51]
+size = 14
+font_data = ExtResource( 6 )
+
+[sub_resource type="StyleBoxFlat" id=52]
+content_margin_left = 6.0
+bg_color = Color( 0.145098, 0.0313726, 0.27451, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="DynamicFont" id=53]
+size = 12
+font_data = ExtResource( 6 )
+
+[sub_resource type="DynamicFont" id=54]
+font_data = ExtResource( 6 )
+
+[sub_resource type="StyleBoxFlat" id=55]
+bg_color = Color( 0.290196, 0.341176, 0.682353, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="StyleBoxFlat" id=56]
+bg_color = Color( 0.0862745, 0.121569, 0.372549, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="DynamicFont" id=57]
+size = 14
+font_data = ExtResource( 6 )
+
+[sub_resource type="StyleBoxFlat" id=58]
+content_margin_left = 7.0
+content_margin_right = 8.0
+bg_color = Color( 0.0941176, 0.0470588, 0.411765, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+expand_margin_left = 7.0
+
+[sub_resource type="StyleBoxFlat" id=59]
+content_margin_left = 6.0
+content_margin_right = 15.0
+bg_color = Color( 0.0745098, 0, 0.298039, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+expand_margin_left = 8.0
+
+[sub_resource type="StyleBoxFlat" id=60]
+bg_color = Color( 0.105882, 0.0470588, 0.286275, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="StyleBoxFlat" id=62]
+bg_color = Color( 0.0666667, 0.0588235, 0.219608, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="DynamicFont" id=63]
+size = 20
+font_data = ExtResource( 6 )
+
+[sub_resource type="StyleBoxFlat" id=64]
+bg_color = Color( 0.0352941, 0.0431373, 0.196078, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0.294118, 0.294118, 0.294118, 1 )
+
+[sub_resource type="StyleBoxFlat" id=65]
+content_margin_left = 5.0
+bg_color = Color( 0.0588235, 0.0470588, 0.145098, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="DynamicFont" id=22]
+size = 30
+font_data = ExtResource( 6 )
+
+[node name="Main" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 7 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Background" type="Control" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -20.0
+margin_top = -20.0
+margin_right = 20.0
+margin_bottom = 20.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="Background"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -960.0
+margin_top = -540.0
+margin_right = 960.0
+margin_bottom = 540.0
+color = Color( 0.137255, 0.14902, 0.258824, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Clouds" type="ColorRect" parent="Background"]
+material = SubResource( 32 )
+margin_left = -938.0
+margin_top = -352.0
+margin_right = 974.0
+margin_bottom = 560.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Gradient" type="TextureRect" parent="Background"]
+modulate = Color( 1, 1, 1, 0.431373 )
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -960.0
+margin_top = -540.0
+margin_right = 960.0
+margin_bottom = 540.0
+texture = SubResource( 7 )
+expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Background"]
+autoplay = "anim"
+anims/anim = SubResource( 5 )
+
+[node name="Control" type="Control" parent="Background"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -20.0
+margin_right = 20.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Logo" type="Sprite" parent="Background/Control"]
+position = Vector2( 28, -178 )
+scale = Vector2( 0.25, 0.25 )
+texture = ExtResource( 1 )
+
+[node name="Info" type="RichTextLabel" parent="Background"]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_left = -280.0
+margin_top = -152.0
+margin_right = 296.0
+margin_bottom = -128.0
+custom_fonts/normal_font = SubResource( 29 )
+text = "Hello, %PLAYER%! Client Selected: %CLIENT%, Map Selected: %MAP%"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Control2" type="Control" parent="Background"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -20.0
+margin_top = -20.0
+margin_right = 20.0
+margin_bottom = 20.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Background/Control2"]
+margin_left = -212.0
+margin_right = 260.0
+margin_bottom = 104.0
+custom_fonts/normal_font = SubResource( 10 )
+text = "NovetusFE appears to be installed incorrectly. Please move NovetusFE into your Novetus Installation Folder"
+
+[node name="LineEdit" type="LineEdit" parent="Background/Control2"]
+visible = false
+margin_left = -210.0
+margin_top = 104.0
+margin_right = 182.0
+margin_bottom = 133.0
+custom_fonts/font = SubResource( 36 )
+text = "Path to Novetus Install Directory"
+
+[node name="FirstTime" type="Control" parent="Background"]
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="Panel" type="Panel" parent="Background/FirstTime"]
+margin_left = -260.0
+margin_top = -88.0
+margin_right = 308.0
+margin_bottom = 296.0
+custom_styles/panel = SubResource( 66 )
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Background/FirstTime/Panel"]
+margin_left = 10.0
+margin_top = 8.0
+margin_right = 562.0
+margin_bottom = 376.0
+custom_fonts/normal_font = SubResource( 67 )
+text = "Hello and welcome to NovetusFE, an optional Launcher for Novetus. Essentially, its just a frontend for all the heavy lifting and hard work that Bitl does, but I decided to be fancy and make my own frontend for looks. Well, aside from that, I do have big plans, but I would like to welcome you to NovetusFE.
+
+This is the first alpha release, 0.1.0, many things are not implemented yet, broken, or poorly optimized, and I am aware, and working towards fixing it and improving everything.
+
+Welp, thats everything I have to say for now, checking for updates will come in a future version, so what can you do in NovetusFE? Join servers. Thats it, for now. Everything else is just kind of incomplete at the moment but I wanted to release to github so others could see the code, give me recommendations and in general, just have it be open source.
+
+So yeah, have fun I guess lol, Lachrymogenic."
+
+[node name="Button" type="Button" parent="Background/FirstTime/Panel"]
+margin_left = 370.0
+margin_top = 344.0
+margin_right = 548.0
+margin_bottom = 368.0
+text = "This was rushed, wasnt it?"
+
+[node name="Main" type="Control" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -20.0
+margin_top = -20.0
+margin_right = 20.0
+margin_bottom = 20.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Menu" type="Control" parent="Main"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="Panel" parent="Main/Menu"]
+margin_left = -263.0
+margin_top = -88.0
+margin_right = 313.0
+margin_bottom = 296.0
+custom_styles/panel = SubResource( 8 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ItemList" type="ItemList" parent="Main/Menu"]
+margin_left = -252.0
+margin_top = -72.0
+margin_right = 300.0
+margin_bottom = 288.0
+custom_fonts/font = SubResource( 11 )
+custom_styles/selected_focus = ExtResource( 9 )
+custom_styles/bg = SubResource( 9 )
+items = [ "Multiplayer", ExtResource( 2 ), false, "Studio (Coming Soon)", ExtResource( 4 ), false, "Character Customization (Coming Soon)", ExtResource( 3 ), false, "Settings", ExtResource( 5 ), false, "Workshop (Coming Soon)", ExtResource( 5 ), false ]
+fixed_icon_size = Vector2( 64, 64 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Multiplayer" type="Control" parent="Main"]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -20.0
+margin_top = -20.0
+margin_right = 20.0
+margin_bottom = 20.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="Panel" parent="Main/Multiplayer"]
+margin_left = -263.0
+margin_top = -88.0
+margin_right = 313.0
+margin_bottom = 296.0
+custom_styles/panel = SubResource( 8 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ItemList" type="ItemList" parent="Main/Multiplayer"]
+margin_left = -252.0
+margin_top = -72.0
+margin_right = 300.0
+margin_bottom = 288.0
+custom_fonts/font = SubResource( 11 )
+custom_styles/selected_focus = ExtResource( 9 )
+custom_styles/bg = SubResource( 9 )
+items = [ "Join", ExtResource( 2 ), false, "Host (Coming Soon)", ExtResource( 3 ), false, "Back", ExtResource( 5 ), false ]
+fixed_icon_size = Vector2( 64, 64 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Studio" type="Control" parent="Main"]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -20.0
+margin_top = -20.0
+margin_right = 20.0
+margin_bottom = 20.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="Panel" parent="Main/Studio"]
+margin_left = -263.0
+margin_top = -88.0
+margin_right = 313.0
+margin_bottom = 296.0
+custom_styles/panel = SubResource( 8 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ItemList" type="ItemList" parent="Main/Studio"]
+margin_left = -252.0
+margin_top = -72.0
+margin_right = 300.0
+margin_bottom = 288.0
+custom_fonts/font = SubResource( 11 )
+custom_styles/selected_focus = ExtResource( 9 )
+custom_styles/bg = SubResource( 9 )
+items = [ "Launch without map (Coming Soon)", ExtResource( 5 ), false, "Launch with map", ExtResource( 5 ), false, "Play Solo (Coming Soon)", ExtResource( 5 ), false, "Versions", ExtResource( 5 ), false, "Back", ExtResource( 5 ), false ]
+fixed_icon_size = Vector2( 64, 64 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Settings" type="Control" parent="Main"]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -20.0
+margin_top = -20.0
+margin_right = 20.0
+margin_bottom = 20.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="Panel" parent="Main/Settings"]
+margin_left = -263.0
+margin_top = -88.0
+margin_right = 313.0
+margin_bottom = 296.0
+custom_styles/panel = SubResource( 8 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ItemList" type="ItemList" parent="Main/Settings"]
+margin_left = -252.0
+margin_top = -72.0
+margin_right = 300.0
+margin_bottom = 288.0
+custom_fonts/font = SubResource( 11 )
+custom_styles/selected_focus = ExtResource( 9 )
+custom_styles/bg = SubResource( 9 )
+items = [ "Linux Settings", ExtResource( 5 ), false, "General Settings", ExtResource( 5 ), false, "Launch Novetus", ExtResource( 5 ), false, "Back", ExtResource( 5 ), false ]
+fixed_icon_size = Vector2( 64, 64 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Linux Settings" type="Control" parent="Main/Settings"]
+visible = false
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="Panel" type="Panel" parent="Main/Settings/Linux Settings"]
+margin_left = -263.0
+margin_top = -88.0
+margin_right = 313.0
+margin_bottom = 296.0
+custom_styles/panel = SubResource( 8 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="WPBox" type="TextEdit" parent="Main/Settings/Linux Settings/Panel"]
+margin_left = 27.0
+margin_top = 77.0
+margin_right = 547.0
+margin_bottom = 101.0
+theme = SubResource( 16 )
+custom_fonts/font = SubResource( 13 )
+custom_styles/normal = SubResource( 14 )
+smooth_scrolling = true
+
+[node name="Ttile" type="RichTextLabel" parent="Main/Settings/Linux Settings/Panel"]
+margin_left = 27.0
+margin_top = 8.0
+margin_right = 275.0
+margin_bottom = 40.0
+custom_fonts/normal_font = SubResource( 21 )
+text = "Linux Settings"
+
+[node name="RichTextLabel3" type="RichTextLabel" parent="Main/Settings/Linux Settings/Panel"]
+margin_left = 27.0
+margin_top = 45.0
+margin_right = 171.0
+margin_bottom = 77.0
+custom_fonts/normal_font = ExtResource( 8 )
+text = "Wine Prefix"
+
+[node name="WPBox2" type="TextEdit" parent="Main/Settings/Linux Settings/Panel"]
+margin_left = 27.0
+margin_top = 141.0
+margin_right = 547.0
+margin_bottom = 165.0
+theme = SubResource( 16 )
+custom_fonts/font = SubResource( 13 )
+custom_styles/normal = SubResource( 14 )
+smooth_scrolling = true
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="Main/Settings/Linux Settings/Panel"]
+margin_left = 27.0
+margin_top = 109.0
+margin_right = 267.0
+margin_bottom = 141.0
+custom_fonts/normal_font = ExtResource( 8 )
+text = "Wine Executable Path"
+
+[node name="WPBox3" type="TextEdit" parent="Main/Settings/Linux Settings/Panel"]
+visible = false
+margin_left = 27.0
+margin_top = 205.0
+margin_right = 547.0
+margin_bottom = 229.0
+theme = SubResource( 16 )
+custom_fonts/font = SubResource( 13 )
+custom_styles/normal = SubResource( 14 )
+smooth_scrolling = true
+
+[node name="RichTextLabel5" type="RichTextLabel" parent="Main/Settings/Linux Settings/Panel"]
+margin_left = 27.0
+margin_top = 296.0
+margin_right = 435.0
+margin_bottom = 328.0
+custom_fonts/normal_font = ExtResource( 8 )
+text = "Leave blank for no custom wine or terminal"
+
+[node name="Button" type="Button" parent="Main/Settings/Linux Settings/Panel"]
+margin_left = 27.0
+margin_top = 328.0
+margin_right = 139.0
+margin_bottom = 368.0
+custom_fonts/font = ExtResource( 8 )
+custom_styles/hover = SubResource( 20 )
+custom_styles/normal = SubResource( 19 )
+text = "Back"
+
+[node name="Save" type="Button" parent="Main/Settings/Linux Settings/Panel"]
+margin_left = 155.0
+margin_top = 328.0
+margin_right = 267.0
+margin_bottom = 368.0
+custom_fonts/font = ExtResource( 8 )
+custom_styles/hover = SubResource( 20 )
+custom_styles/normal = SubResource( 19 )
+text = "Save"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CheckBox" type="CheckBox" parent="Main/Settings/Linux Settings/Panel"]
+margin_left = 27.0
+margin_top = 168.0
+margin_right = 207.0
+margin_bottom = 208.0
+custom_fonts/font = ExtResource( 8 )
+text = "Run in Console?"
+flat = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="General Settings" type="Control" parent="Main/Settings"]
+visible = false
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="Panel" type="Panel" parent="Main/Settings/General Settings"]
+margin_left = -263.0
+margin_top = -88.0
+margin_right = 313.0
+margin_bottom = 296.0
+custom_styles/panel = SubResource( 8 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Ttile" type="RichTextLabel" parent="Main/Settings/General Settings/Panel"]
+margin_left = 27.0
+margin_top = 8.0
+margin_right = 275.0
+margin_bottom = 40.0
+custom_fonts/normal_font = SubResource( 21 )
+text = "General Settings"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button" type="Button" parent="Main/Settings/General Settings/Panel"]
+margin_left = 27.0
+margin_top = 328.0
+margin_right = 139.0
+margin_bottom = 368.0
+custom_fonts/font = ExtResource( 8 )
+custom_styles/hover = SubResource( 20 )
+custom_styles/normal = SubResource( 19 )
+text = "Back"
+
+[node name="Save" type="Button" parent="Main/Settings/General Settings/Panel"]
+margin_left = 155.0
+margin_top = 328.0
+margin_right = 267.0
+margin_bottom = 368.0
+custom_fonts/font = ExtResource( 8 )
+custom_styles/hover = SubResource( 20 )
+custom_styles/normal = SubResource( 19 )
+text = "Save"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ThemeButton" type="Button" parent="Main/Settings/General Settings/Panel"]
+margin_left = 227.0
+margin_top = 53.0
+margin_right = 362.0
+margin_bottom = 82.0
+custom_fonts/font = ExtResource( 8 )
+custom_styles/hover = SubResource( 28 )
+custom_styles/normal = SubResource( 25 )
+text = "Create Theme"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="OptionButton" type="OptionButton" parent="Main/Settings/General Settings/Panel"]
+margin_left = 27.0
+margin_top = 53.0
+margin_right = 219.0
+margin_bottom = 82.0
+custom_fonts/font = ExtResource( 8 )
+custom_styles/hover = SubResource( 26 )
+custom_styles/normal = SubResource( 27 )
+text = "Themes"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VersionsWindow" type="WindowDialog" parent="Main"]
+margin_left = -160.0
+margin_top = -21.0
+margin_right = 230.0
+margin_bottom = 267.0
+window_title = "Versions"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Versions" type="Control" parent="Main/VersionsWindow"]
+margin_left = -1.0
+margin_right = 39.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ItemList" type="ItemList" parent="Main/VersionsWindow/Versions"]
+margin_left = 1.0
+margin_right = 391.0
+margin_bottom = 296.0
+custom_fonts/font = SubResource( 11 )
+custom_styles/selected_focus = ExtResource( 9 )
+custom_styles/bg = SubResource( 30 )
+items = [ "Back", ExtResource( 5 ), false ]
+fixed_icon_size = Vector2( 64, 64 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Maps" type="FileDialog" parent="Main"]
+margin_left = -266.0
+margin_top = -72.0
+margin_right = 318.0
+margin_bottom = 296.0
+window_title = "Open a File"
+resizable = true
+dialog_text = "huh"
+dialog_hide_on_ok = true
+mode = 0
+access = 2
+current_dir = "/home/lachrymogenic/Documents/novetus/maps"
+current_path = "/home/lachrymogenic/Documents/novetus/maps/"
+
+[node name="CharCus" type="WindowDialog" parent="Main"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -286.0
+margin_top = -124.0
+margin_right = 298.0
+margin_bottom = 276.0
+custom_fonts/title_font = SubResource( 61 )
+window_title = "Character Customization"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="Panel" parent="Main/CharCus"]
+margin_right = 584.0
+margin_bottom = 400.0
+custom_styles/panel = SubResource( 43 )
+
+[node name="Panel2" type="Panel" parent="Main/CharCus"]
+margin_left = 24.0
+margin_top = 64.0
+margin_right = 240.0
+margin_bottom = 280.0
+custom_styles/panel = SubResource( 43 )
+
+[node name="Control" type="Control" parent="Main/CharCus"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -20.0
+margin_top = -20.0
+margin_right = 20.0
+margin_bottom = 20.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Viewport" type="Viewport" parent="Main/CharCus/Control"]
+size = Vector2( 200, 200 )
+render_target_v_flip = true
+
+[node name="Spatial" type="Spatial" parent="Main/CharCus/Control/Viewport"]
+
+[node name="roblox" type="MeshInstance" parent="Main/CharCus/Control/Viewport/Spatial"]
+mesh = ExtResource( 10 )
+material/0 = SubResource( 42 )
+material/1 = SubResource( 44 )
+material/2 = SubResource( 45 )
+material/3 = SubResource( 46 )
+material/4 = SubResource( 47 )
+material/5 = SubResource( 48 )
+
+[node name="Face" type="MeshInstance" parent="Main/CharCus/Control/Viewport/Spatial/roblox"]
+transform = Transform( 1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 4.56394, 0.599687 )
+mesh = SubResource( 49 )
+material/0 = SubResource( 50 )
+
+[node name="Camera" type="Camera" parent="Main/CharCus/Control/Viewport/Spatial"]
+transform = Transform( 1, 0, 0, 0, 0.917949, 0.396699, 0, -0.396699, 0.917949, 0, 5.24755, 4.36377 )
+current = true
+
+[node name="Skybox" parent="Main/CharCus/Control/Viewport/Spatial" instance=ExtResource( 12 )]
+transform = Transform( 5, 0, 0, 0, 5, 0, 0, 0, 5, -4.08156, 1.38683, 0.191704 )
+TextureFront = ExtResource( 13 )
+TextureBack = ExtResource( 17 )
+TextureBottom = ExtResource( 14 )
+TextureUp = ExtResource( 11 )
+TextureLeft = ExtResource( 15 )
+TextureRight = ExtResource( 16 )
+
+[node name="MeshInstance" type="MeshInstance" parent="Main/CharCus/Control/Viewport/Spatial"]
+transform = Transform( 7.54198, 0, 0, 0, 1, 0, 0, 0, 11.2381, 0, -1.03205, 0 )
+mesh = SubResource( 39 )
+material/0 = null
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="Main/CharCus/Control/Viewport/Spatial"]
+environment = SubResource( 41 )
+
+[node name="TextureRect" type="TextureRect" parent="Main/CharCus/Control"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -260.0
+margin_top = -128.0
+margin_right = -60.0
+margin_bottom = 72.0
+texture = SubResource( 37 )
+stretch_mode = 3
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LineEdit" type="LineEdit" parent="Main/CharCus"]
+margin_left = 24.0
+margin_top = 32.0
+margin_right = 240.0
+margin_bottom = 56.0
+custom_fonts/font = SubResource( 51 )
+custom_styles/normal = SubResource( 52 )
+text = "Lachrymogenic"
+
+[node name="Label" type="Label" parent="Main/CharCus"]
+margin_left = 24.0
+margin_top = 16.0
+margin_right = 86.0
+margin_bottom = 30.0
+custom_fonts/font = SubResource( 53 )
+text = "Player Name"
+
+[node name="Save" type="Button" parent="Main/CharCus"]
+margin_left = 24.0
+margin_top = 288.0
+margin_right = 128.0
+margin_bottom = 311.0
+custom_fonts/font = SubResource( 54 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/normal = SubResource( 56 )
+text = "Save"
+
+[node name="Save2" type="Button" parent="Main/CharCus"]
+margin_left = 136.0
+margin_top = 288.0
+margin_right = 240.0
+margin_bottom = 311.0
+custom_fonts/font = SubResource( 54 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/normal = SubResource( 56 )
+text = "Load..."
+
+[node name="TabContainer" type="TabContainer" parent="Main/CharCus"]
+margin_left = 256.0
+margin_top = 32.0
+margin_right = 552.0
+margin_bottom = 312.0
+custom_fonts/font = SubResource( 57 )
+custom_styles/tab_fg = SubResource( 58 )
+custom_styles/tab_bg = SubResource( 59 )
+custom_styles/panel = SubResource( 60 )
+tab_align = 0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Body" type="Tabs" parent="Main/CharCus/TabContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_top = 29.0
+margin_right = -2.0
+margin_bottom = -2.0
+
+[node name="Hats" type="Tabs" parent="Main/CharCus/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_top = 29.0
+margin_right = -2.0
+margin_bottom = -2.0
+
+[node name="Heads" type="Tabs" parent="Main/CharCus/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_top = 29.0
+margin_right = -2.0
+margin_bottom = -2.0
+
+[node name="Faces" type="Tabs" parent="Main/CharCus/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_top = 29.0
+margin_right = -2.0
+margin_bottom = -2.0
+
+[node name="T-Shirts" type="Tabs" parent="Main/CharCus/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_top = 29.0
+margin_right = -2.0
+margin_bottom = -2.0
+
+[node name="Shirts" type="Tabs" parent="Main/CharCus/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_top = 29.0
+margin_right = -2.0
+margin_bottom = -2.0
+
+[node name="Pants" type="Tabs" parent="Main/CharCus/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_top = 29.0
+margin_right = -2.0
+margin_bottom = -2.0
+
+[node name="Extra" type="Tabs" parent="Main/CharCus/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_top = 29.0
+margin_right = -2.0
+margin_bottom = -2.0
+
+[node name="Other" type="Tabs" parent="Main/CharCus/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 2.0
+margin_top = 29.0
+margin_right = -2.0
+margin_bottom = -2.0
+
+[node name="Serverlist" type="WindowDialog" parent="Main"]
+margin_left = -266.0
+margin_top = -104.0
+margin_right = 318.0
+margin_bottom = 296.0
+
+[node name="Panel" type="Panel" parent="Main/Serverlist"]
+margin_right = 584.0
+margin_bottom = 400.0
+custom_styles/panel = SubResource( 62 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ItemList" type="ItemList" parent="Main/Serverlist"]
+margin_right = 584.0
+margin_bottom = 296.0
+custom_fonts/font = SubResource( 11 )
+custom_styles/selected_focus = ExtResource( 9 )
+custom_styles/bg = SubResource( 30 )
+items = [ "Lachry's Server", ExtResource( 3 ), false, "Lach server 2", ExtResource( 3 ), false ]
+fixed_icon_size = Vector2( 64, 64 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Join" type="Button" parent="Main/Serverlist"]
+margin_left = 72.0
+margin_top = 312.0
+margin_right = 200.0
+margin_bottom = 342.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+disabled = true
+text = "Join Server"
+
+[node name="DirectConnect" type="Button" parent="Main/Serverlist"]
+margin_left = 216.0
+margin_top = 312.0
+margin_right = 376.0
+margin_bottom = 342.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+text = "Direct Connect"
+
+[node name="AddServer" type="Button" parent="Main/Serverlist"]
+margin_left = 392.0
+margin_top = 312.0
+margin_right = 520.0
+margin_bottom = 342.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+text = "Add Server"
+
+[node name="Close" type="Button" parent="Main/Serverlist"]
+margin_left = 392.0
+margin_top = 352.0
+margin_right = 520.0
+margin_bottom = 382.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+text = "Close"
+
+[node name="Edit" type="Button" parent="Main/Serverlist"]
+margin_left = 72.0
+margin_top = 352.0
+margin_right = 200.0
+margin_bottom = 382.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+disabled = true
+text = "Edit"
+
+[node name="Browser" type="Button" parent="Main/Serverlist"]
+margin_left = 216.0
+margin_top = 352.0
+margin_right = 376.0
+margin_bottom = 382.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+disabled = true
+text = "Online Browser"
+
+[node name="DirectConnectWindow" type="WindowDialog" parent="Main"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -148.5
+margin_top = -72.0
+margin_right = 148.5
+margin_bottom = 72.0
+window_title = "Direct Connect"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="Panel" parent="Main/DirectConnectWindow"]
+margin_right = 296.0
+margin_bottom = 144.0
+custom_styles/panel = SubResource( 62 )
+
+[node name="LineEdit" type="LineEdit" parent="Main/DirectConnectWindow"]
+margin_left = 15.0
+margin_top = 54.0
+margin_right = 279.0
+margin_bottom = 78.0
+custom_styles/normal = SubResource( 65 )
+
+[node name="Join" type="Button" parent="Main/DirectConnectWindow"]
+margin_left = 15.0
+margin_top = 94.0
+margin_right = 143.0
+margin_bottom = 124.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+text = "Join Server"
+
+[node name="Close" type="Button" parent="Main/DirectConnectWindow"]
+margin_left = 151.0
+margin_top = 94.0
+margin_right = 279.0
+margin_bottom = 124.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+text = "Close"
+
+[node name="Label" type="Label" parent="Main/DirectConnectWindow"]
+margin_left = 15.0
+margin_top = 22.0
+margin_right = 279.0
+margin_bottom = 46.0
+custom_fonts/font = ExtResource( 8 )
+text = "Server Address"
+
+[node name="Overlay" type="Control" parent="."]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -20.0
+margin_top = -20.0
+margin_right = 20.0
+margin_bottom = 20.0
+
+[node name="ColorRect" type="ColorRect" parent="Overlay"]
+modulate = Color( 1, 1, 1, 0.564706 )
+margin_left = -268.0
+margin_top = -88.0
+margin_right = 316.0
+margin_bottom = 296.0
+color = Color( 0, 0, 0, 1 )
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Overlay"]
+margin_left = -116.0
+margin_top = 72.0
+margin_right = 220.0
+margin_bottom = 128.0
+custom_fonts/normal_font = SubResource( 22 )
+text = "Starting Novetus..."
+
+[connection signal="text_entered" from="Background/Control2/LineEdit" to="." method="workingdirectory_text_entered"]
+[connection signal="pressed" from="Background/FirstTime/Panel/Button" to="." method="Firsttime_Button_pressed"]
+[connection signal="item_activated" from="Main/Menu/ItemList" to="." method="main_item_activated"]
+[connection signal="item_activated" from="Main/Multiplayer/ItemList" to="." method="multiplayert_item_activated"]
+[connection signal="item_activated" from="Main/Studio/ItemList" to="." method="studio_item_activated"]
+[connection signal="item_activated" from="Main/Settings/ItemList" to="." method="settings_item_activated"]
+[connection signal="pressed" from="Main/Settings/Linux Settings/Panel/Button" to="." method="Back_pressed"]
+[connection signal="pressed" from="Main/Settings/Linux Settings/Panel/Save" to="." method="_on_Save_pressed"]
+[connection signal="pressed" from="Main/Settings/General Settings/Panel/Button" to="." method="Back_pressed"]
+[connection signal="pressed" from="Main/Settings/General Settings/Panel/Save" to="." method="_on_Save_pressed"]
+[connection signal="pressed" from="Main/Settings/General Settings/Panel/ThemeButton" to="." method="_on_ThemeButton_pressed"]
+[connection signal="button_down" from="Main/Settings/General Settings/Panel/OptionButton" to="." method="_on_MenuButton_about_to_show"]
+[connection signal="item_selected" from="Main/Settings/General Settings/Panel/OptionButton" to="." method="_on_OptionButton_item_selected"]
+[connection signal="item_activated" from="Main/VersionsWindow/Versions/ItemList" to="." method="versionslist_activated"]
+[connection signal="confirmed" from="Main/Maps" to="." method="_on_Maps_confirmed"]
+[connection signal="item_activated" from="Main/Serverlist/ItemList" to="." method="versionslist_activated"]
+[connection signal="pressed" from="Main/Serverlist/DirectConnect" to="." method="_on_DirectConnect_pressed"]
+[connection signal="pressed" from="Main/DirectConnectWindow/Join" to="." method="DirectConnect_Join_pressed"]
+[connection signal="pressed" from="Main/DirectConnectWindow/Close" to="." method="DirectConnect_Close_pressed"]

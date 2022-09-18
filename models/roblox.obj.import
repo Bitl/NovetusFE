@@ -1,0 +1,20 @@
+[remap]
+
+importer="wavefront_obj"
+type="Mesh"
+path="res://.import/roblox.obj-4faa4d9b028f39602354dc5183095932.mesh"
+
+[deps]
+
+files=[ "res://.import/roblox.obj-4faa4d9b028f39602354dc5183095932.mesh" ]
+
+source_file="res://models/roblox.obj"
+dest_files=[ "res://.import/roblox.obj-4faa4d9b028f39602354dc5183095932.mesh", "res://.import/roblox.obj-4faa4d9b028f39602354dc5183095932.mesh" ]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3( 1, 1, 1 )
+offset_mesh=Vector3( 0, 0, 0 )
+octahedral_compression=true
+optimize_mesh_flags=4286

@@ -318,7 +318,7 @@ func imageadd(path):
 	t.texture_normal = pathtoimage(path,[56,56])
 	$Main/AddServerWindow/ScrollContainer/HBoxContainer.add_child(t)
 	NewServerTexture = t.texture_normal
-	t.connect("pressed",self,"icon_pressed",[t.texture_normal,t])
+	t.connect("pressed",self,"icon_pressed",[t.texture_normal,t,path])
 
 func pathtoimage(path,resize=null):
 	var img = Image.new()
@@ -332,13 +332,16 @@ func pathtoimage(path,resize=null):
 	img_tex.create_from_image(img)
 	return img_tex
 
-func icon_pressed(icon,node):
-	NewServerTexture = icon
+func icon_pressed(icon,node,path):
 	for i in $Main/AddServerWindow/ScrollContainer/HBoxContainer.get_children():
 		if i is TextureButton:
 			i.modulate = Color("707070")
 	node.modulate = Color("ffffff")
+	NewServerTexture = icon
+	NewServerTexturePath = path
 	print("pressed")
+	print(NewServerTexture)
+	print(icon)
 
 func AddServer_Close_pressed():
 	$Main/AddServerWindow.visible = false

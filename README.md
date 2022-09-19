@@ -1,5 +1,5 @@
  # NovetusFE
- A frontend application for Novetus, by https://bitl.itch.io
+ A frontend application made for Novetus, by https://bitl.itch.io
  
  # Features / planned
  - Multiplayer Server List

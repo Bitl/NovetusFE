@@ -123,14 +123,13 @@ func settings_item_activated(index):
 		"General Settings":
 			$"Main/Settings/General Settings".visible = true
 		"Launch Novetus":
-			$Overlay.visible = true
-			yield(get_tree().create_timer(1),"timeout")
 			launch("/bin/Novetus.exe")
-			$Overlay.visible = false
 			
 			#$Main/Settings/ItemList.grab_focus()
 			
 func launch(program,arg=""):
+	$OverlayLayer/Overlay.visible = true
+	yield(get_tree().create_timer(1),"timeout")
 	match OS.get_name():
 		"Windows":
 			if arg == "":
@@ -149,6 +148,7 @@ func launch(program,arg=""):
 					OS.execute("sh",[WorkingDirectory + "/Start.sh", LinuxWinePrefix, LinuxWinePath, WorkingDirectory + program])
 				else:
 					OS.execute("sh",[WorkingDirectory + "/Start.sh", LinuxWinePrefix, LinuxWinePath, WorkingDirectory + program, arg])
+	$OverlayLayer/Overlay.visible = false
 func menu(menu, parent=$Main):
 	for i in $Main.get_children():
 		if i is Control:
@@ -234,15 +234,9 @@ func studio_item_activated(index):
 		"Launch without map":
 			launch("/clients/"+ Version + "/RobloxApp_studio.exe")
 		"Launch with map":
-			$Overlay.visible = true
-			yield(get_tree().create_timer(1),"timeout")
 			launch("/clients/"+ Version + "/RobloxApp_studio.exe", Drive + Map)
-			$Overlay.visible = false
 		"Play Solo":
-			$Overlay.visible = true
-			yield(get_tree().create_timer(1),"timeout")
 			launch("/clients/"+ Version + "/RobloxApp_solo.exe", Drive + Map)
-			$Overlay.visible = false
 			
 func _input(event):
 	if Input.is_action_just_pressed("versions"):
@@ -257,12 +251,6 @@ func _input(event):
 func _on_Maps_confirmed():
 	print($Main/Maps.current_file)
 	Map = str($Main/Maps.current_dir.replace(WorkingDirectory,"") + "/" + $Main/Maps.current_file)
-	#Map = "../.." + Map
-	#var counter = 0
-	#for i in Map:
-	#	if i == "/":
-	#		Map[counter] = "//"
-	#	counter += 1
 	Map = Map.replacen("/","//")
 	Map = WorkingDirectory.replacen("/","//") + Map
 	$Background/Info.text = "Hello, %PLAYER%! Client Selected: %CLIENT%, Map Selected: %MAP%"
@@ -319,6 +307,9 @@ func imageadd(path):
 	$Main/AddServerWindow/ScrollContainer/HBoxContainer.add_child(t)
 	NewServerTexture = t.texture_normal
 	t.connect("pressed",self,"icon_pressed",[t.texture_normal,t,path])
+	var e = t.duplicate()
+	$Main/EditServerWindow/ScrollContainer/HBoxContainer.add_child(e)
+	e.connect("pressed",self,"icon_pressed",[e.texture_normal,e,path])
 
 func pathtoimage(path,resize=null):
 	var img = Image.new()
@@ -336,15 +327,17 @@ func icon_pressed(icon,node,path):
 	for i in $Main/AddServerWindow/ScrollContainer/HBoxContainer.get_children():
 		if i is TextureButton:
 			i.modulate = Color("707070")
+	for i in $Main/EditServerWindow/ScrollContainer/HBoxContainer.get_children():
+		if i is TextureButton:
+			i.modulate = Color("707070")
 	node.modulate = Color("ffffff")
 	NewServerTexture = icon
 	NewServerTexturePath = path
 	print("pressed")
-	print(NewServerTexture)
-	print(icon)
 
 func AddServer_Close_pressed():
 	$Main/AddServerWindow.visible = false
+	$Main/EditServerWindow.visible = false
 
 
 func _on_Add_Server_pressed():
@@ -385,19 +378,40 @@ func mplist_item_selected(index):
 
 
 func _on_Join_pressed():
-	$Overlay.visible = true
-	yield(get_tree().create_timer(1),"timeout")
 	var e = $Main/Serverlist/ItemList.get_item_text(ServerIndex)
 	serverconfig.load(WorkingDirectory + "/NovetusFE/servers.ini")
 	launch("/bin/NovetusURI.exe " + to_uri(serverconfig.get_value(e,"ip"),serverconfig.get_value(e,"port")))
-	$Overlay.visible = false
 	
-
 
 func multi_Versions_pressed():
 	$Main/Serverlist/Versions.text = Version
 	$Main/VersionsWindow.popup()
 
-
 func multi_closed():
 	$Main/Serverlist.visible = false
+
+func multi_edit_pressed():
+	var e = $Main/Serverlist/ItemList.get_item_text(ServerIndex)
+	serverconfig.load(WorkingDirectory + "/NovetusFE/servers.ini")
+	$Main/EditServerWindow/LineEdit2.text = e
+	$Main/EditServerWindow/LineEdit.text = serverconfig.get_value(e,"ip") + ":" + serverconfig.get_value(e,"port")
+	$Main/EditServerWindow.popup()
+
+func delete_server_pressed():
+	serverconfig.load(WorkingDirectory + "/NovetusFE/servers.ini")
+	serverconfig.erase_section($Main/EditServerWindow/LineEdit2.text)
+	serverconfig.save(WorkingDirectory + "/NovetusFE/servers.ini")
+	$Main/EditServerWindow.visible = false
+	refreshserverlist()
+
+func save_server_pressed():
+	var e = $Main/Serverlist/ItemList.get_item_text(ServerIndex)
+	serverconfig.load(WorkingDirectory + "/NovetusFE/servers.ini")
+	serverconfig.erase_section(e)
+	e = $Main/EditServerWindow/LineEdit2.text
+	serverconfig.set_value(e,"ip",$Main/EditServerWindow/LineEdit.text.split(":")[0])
+	serverconfig.set_value(e,"port",$Main/EditServerWindow/LineEdit.text.split(":")[1])
+	serverconfig.set_value(e, "icon", NewServerTexturePath)
+	serverconfig.save(WorkingDirectory + "/NovetusFE/servers.ini")
+	refreshserverlist()
+	$Main/EditServerWindow.visible = false

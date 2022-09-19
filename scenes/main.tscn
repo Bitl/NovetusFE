@@ -1,4 +1,4 @@
-[gd_scene load_steps=81 format=2]
+[gd_scene load_steps=84 format=2]
 
 [ext_resource path="res://textures/hZZ7X7.png" type="Texture" id=1]
 [ext_resource path="res://textures/multiplayer.png" type="Texture" id=2]
@@ -402,6 +402,9 @@ border_width_right = 2
 border_width_bottom = 2
 border_color = Color( 0.294118, 0.294118, 0.294118, 1 )
 
+[sub_resource type="DynamicFont" id=76]
+font_data = ExtResource( 6 )
+
 [sub_resource type="StyleBoxFlat" id=65]
 content_margin_left = 5.0
 bg_color = Color( 0.0588235, 0.0470588, 0.145098, 1 )
@@ -409,6 +412,12 @@ border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
+
+[sub_resource type="DynamicFont" id=77]
+font_data = ExtResource( 6 )
+
+[sub_resource type="DynamicFont" id=78]
+font_data = ExtResource( 6 )
 
 [sub_resource type="DynamicFont" id=74]
 size = 17
@@ -1312,6 +1321,228 @@ custom_styles/disabled = SubResource( 64 )
 custom_styles/normal = SubResource( 56 )
 text = "Version"
 
+[node name="HostWindow" type="WindowDialog" parent="Main"]
+margin_left = -266.0
+margin_top = -104.0
+margin_right = 318.0
+margin_bottom = 296.0
+window_title = "Host Server"
+
+[node name="Panel" type="Panel" parent="Main/HostWindow"]
+margin_right = 584.0
+margin_bottom = 400.0
+custom_styles/panel = SubResource( 62 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel2" type="Panel" parent="Main/HostWindow"]
+margin_right = 584.0
+margin_bottom = 296.0
+custom_styles/panel = SubResource( 73 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Join" type="Button" parent="Main/HostWindow"]
+margin_left = 72.0
+margin_top = 312.0
+margin_right = 200.0
+margin_bottom = 342.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+text = "Host"
+
+[node name="DirectConnect" type="Button" parent="Main/HostWindow"]
+margin_left = 216.0
+margin_top = 312.0
+margin_right = 376.0
+margin_bottom = 342.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+text = "Maps"
+
+[node name="AddServer" type="Button" parent="Main/HostWindow"]
+margin_left = 392.0
+margin_top = 312.0
+margin_right = 520.0
+margin_bottom = 342.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+text = "Addons"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Close" type="Button" parent="Main/HostWindow"]
+margin_left = 392.0
+margin_top = 352.0
+margin_right = 520.0
+margin_bottom = 382.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+text = "Close"
+
+[node name="Edit" type="Button" parent="Main/HostWindow"]
+margin_left = 72.0
+margin_top = 352.0
+margin_right = 200.0
+margin_bottom = 382.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+text = "Presets"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Versions" type="Button" parent="Main/HostWindow"]
+margin_left = 216.0
+margin_top = 352.0
+margin_right = 376.0
+margin_bottom = 382.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+text = "Version"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Main/HostWindow"]
+margin_left = 176.0
+margin_top = 8.0
+margin_right = 448.0
+margin_bottom = 224.0
+focus_mode = 2
+custom_fonts/normal_font = SubResource( 76 )
+text = "Server Information:
+IP: %IP%
+Port: %PORT%
+Client: %CLIENT%
+Map: %MAP%
+Players: %PLAYERS%
+Novetus Version: %NOVER%
+URI: %URI%
+"
+selection_enabled = true
+
+[node name="LineEdit" type="LineEdit" parent="Main/HostWindow"]
+margin_left = 16.0
+margin_top = 32.0
+margin_right = 160.0
+margin_bottom = 56.0
+custom_styles/normal = SubResource( 65 )
+placeholder_text = "Novetus"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LineEdit2" type="LineEdit" parent="Main/HostWindow"]
+margin_left = 16.0
+margin_top = 88.0
+margin_right = 160.0
+margin_bottom = 112.0
+custom_styles/normal = SubResource( 65 )
+placeholder_text = "53640"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LineEdit3" type="LineEdit" parent="Main/HostWindow"]
+margin_left = 16.0
+margin_top = 144.0
+margin_right = 160.0
+margin_bottom = 168.0
+custom_styles/normal = SubResource( 65 )
+placeholder_text = "12"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LineEdit4" type="LineEdit" parent="Main/HostWindow"]
+margin_left = 16.0
+margin_top = 200.0
+margin_right = 160.0
+margin_bottom = 224.0
+custom_styles/normal = SubResource( 65 )
+placeholder_text = "novetus.viw.se"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="Main/HostWindow"]
+margin_left = 16.0
+margin_top = 8.0
+margin_right = 64.0
+margin_bottom = 27.0
+custom_fonts/font = SubResource( 77 )
+text = "Name"
+
+[node name="Label2" type="Label" parent="Main/HostWindow"]
+margin_left = 16.0
+margin_top = 64.0
+margin_right = 64.0
+margin_bottom = 83.0
+custom_fonts/font = SubResource( 77 )
+text = "Port"
+
+[node name="Label3" type="Label" parent="Main/HostWindow"]
+margin_left = 16.0
+margin_top = 120.0
+margin_right = 69.0
+margin_bottom = 139.0
+custom_fonts/font = SubResource( 77 )
+text = "Players"
+
+[node name="Label4" type="Label" parent="Main/HostWindow"]
+margin_left = 16.0
+margin_top = 176.0
+margin_right = 136.0
+margin_bottom = 195.0
+custom_fonts/font = SubResource( 77 )
+text = "Master Server IP"
+
+[node name="CheckBox" type="CheckBox" parent="Main/HostWindow"]
+margin_left = 16.0
+margin_top = 256.0
+margin_right = 89.0
+margin_bottom = 283.0
+custom_fonts/font = SubResource( 78 )
+text = "No3D"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CheckBox2" type="CheckBox" parent="Main/HostWindow"]
+margin_left = 96.0
+margin_top = 256.0
+margin_right = 169.0
+margin_bottom = 283.0
+custom_fonts/font = SubResource( 78 )
+text = "UPnP"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CheckBox3" type="CheckBox" parent="Main/HostWindow"]
+margin_left = 16.0
+margin_top = 232.0
+margin_right = 141.0
+margin_bottom = 259.0
+custom_fonts/font = SubResource( 78 )
+text = "Notifications"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="DirectConnectWindow" type="WindowDialog" parent="Main"]
 anchor_left = 0.5
 anchor_top = 0.5
@@ -1500,7 +1731,141 @@ custom_fonts/font = SubResource( 74 )
 custom_styles/normal = SubResource( 75 )
 text = " New "
 
-[node name="Overlay" type="Control" parent="."]
+[node name="EditServerWindow" type="WindowDialog" parent="Main"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -150.0
+margin_top = -72.0
+margin_right = 149.0
+margin_bottom = 204.0
+window_title = "Edit Server"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Panel" type="Panel" parent="Main/EditServerWindow"]
+margin_right = 296.0
+margin_bottom = 276.0
+custom_styles/panel = SubResource( 62 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LineEdit" type="LineEdit" parent="Main/EditServerWindow"]
+margin_left = 16.0
+margin_top = 188.0
+margin_right = 280.0
+margin_bottom = 212.0
+custom_styles/normal = SubResource( 65 )
+placeholder_text = "localhost:53640"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LineEdit2" type="LineEdit" parent="Main/EditServerWindow"]
+margin_left = 16.0
+margin_top = 124.0
+margin_right = 280.0
+margin_bottom = 148.0
+custom_styles/normal = SubResource( 65 )
+placeholder_text = "Novetus"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Add Server" type="Button" parent="Main/EditServerWindow"]
+margin_left = 16.0
+margin_top = 228.0
+margin_right = 144.0
+margin_bottom = 258.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+text = "Delete"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Close" type="Button" parent="Main/EditServerWindow"]
+margin_left = 152.0
+margin_top = 228.0
+margin_right = 280.0
+margin_bottom = 258.0
+custom_fonts/font = SubResource( 63 )
+custom_styles/hover = SubResource( 55 )
+custom_styles/disabled = SubResource( 64 )
+custom_styles/normal = SubResource( 56 )
+text = "Save"
+
+[node name="Label" type="Label" parent="Main/EditServerWindow"]
+margin_left = 16.0
+margin_top = 156.0
+margin_right = 280.0
+margin_bottom = 180.0
+custom_fonts/font = ExtResource( 8 )
+text = "Server Address"
+
+[node name="Label3" type="Label" parent="Main/EditServerWindow"]
+margin_left = 16.0
+margin_top = 92.0
+margin_right = 280.0
+margin_bottom = 116.0
+custom_fonts/font = ExtResource( 8 )
+text = "Server Name"
+
+[node name="Label2" type="Label" parent="Main/EditServerWindow"]
+margin_left = 16.0
+margin_top = 12.0
+margin_right = 280.0
+margin_bottom = 36.0
+custom_fonts/font = ExtResource( 8 )
+text = "Icons"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ImageSelect" type="FileDialog" parent="Main/EditServerWindow"]
+margin_left = -154.0
+margin_top = -60.0
+margin_right = 470.0
+margin_bottom = 340.0
+window_title = "Select an Image"
+mode_overrides_title = false
+mode = 0
+access = 2
+filters = PoolStringArray( "*.png" )
+current_dir = "/home/lachrymogenic/NovetusFE"
+current_path = "/home/lachrymogenic/NovetusFE/"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Main/EditServerWindow"]
+margin_left = 16.0
+margin_top = 36.0
+margin_right = 280.0
+margin_bottom = 92.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Main/EditServerWindow/ScrollContainer"]
+margin_right = 50.0
+margin_bottom = 45.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button" type="Button" parent="Main/EditServerWindow/ScrollContainer/HBoxContainer"]
+margin_right = 50.0
+margin_bottom = 45.0
+custom_fonts/font = SubResource( 74 )
+custom_styles/normal = SubResource( 75 )
+text = " New "
+
+[node name="OverlayLayer" type="CanvasLayer" parent="."]
+
+[node name="Overlay" type="Control" parent="OverlayLayer"]
 visible = false
 anchor_left = 0.5
 anchor_top = 0.5
@@ -1510,22 +1875,31 @@ margin_left = -20.0
 margin_top = -20.0
 margin_right = 20.0
 margin_bottom = 20.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="ColorRect" type="ColorRect" parent="Overlay"]
+[node name="ColorRect" type="ColorRect" parent="OverlayLayer/Overlay"]
 modulate = Color( 1, 1, 1, 0.564706 )
-margin_left = -268.0
-margin_top = -88.0
-margin_right = 316.0
-margin_bottom = 296.0
+margin_left = -954.0
+margin_top = -520.0
+margin_right = 974.0
+margin_bottom = 560.0
 color = Color( 0, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="RichTextLabel" type="RichTextLabel" parent="Overlay"]
+[node name="RichTextLabel" type="RichTextLabel" parent="OverlayLayer/Overlay"]
 margin_left = -116.0
 margin_top = 72.0
 margin_right = 220.0
 margin_bottom = 128.0
 custom_fonts/normal_font = SubResource( 22 )
 text = "Starting Novetus..."
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [connection signal="text_entered" from="Background/Control2/LineEdit" to="." method="workingdirectory_text_entered"]
 [connection signal="pressed" from="Background/FirstTime/Panel/Button" to="." method="Firsttime_Button_pressed"]
@@ -1547,10 +1921,16 @@ text = "Starting Novetus..."
 [connection signal="pressed" from="Main/Serverlist/DirectConnect" to="." method="_on_DirectConnect_pressed"]
 [connection signal="pressed" from="Main/Serverlist/AddServer" to="." method="_on_AddServer_pressed"]
 [connection signal="pressed" from="Main/Serverlist/Close" to="." method="multi_closed"]
+[connection signal="pressed" from="Main/Serverlist/Edit" to="." method="multi_edit_pressed"]
 [connection signal="pressed" from="Main/Serverlist/Versions" to="." method="multi_Versions_pressed"]
+[connection signal="pressed" from="Main/HostWindow/Versions" to="." method="multi_Versions_pressed"]
 [connection signal="pressed" from="Main/DirectConnectWindow/Join" to="." method="DirectConnect_Join_pressed"]
 [connection signal="pressed" from="Main/DirectConnectWindow/Close" to="." method="DirectConnect_Close_pressed"]
 [connection signal="pressed" from="Main/AddServerWindow/Add Server" to="." method="_on_Add_Server_pressed"]
 [connection signal="pressed" from="Main/AddServerWindow/Close" to="." method="AddServer_Close_pressed"]
 [connection signal="file_selected" from="Main/AddServerWindow/ImageSelect" to="." method="_on_ImageSelect_file_selected"]
 [connection signal="pressed" from="Main/AddServerWindow/ScrollContainer/HBoxContainer/Button" to="." method="new_icon_pressed"]
+[connection signal="pressed" from="Main/EditServerWindow/Add Server" to="." method="delete_server_pressed"]
+[connection signal="pressed" from="Main/EditServerWindow/Close" to="." method="save_server_pressed"]
+[connection signal="file_selected" from="Main/EditServerWindow/ImageSelect" to="." method="_on_ImageSelect_file_selected"]
+[connection signal="pressed" from="Main/EditServerWindow/ScrollContainer/HBoxContainer/Button" to="." method="new_icon_pressed"]

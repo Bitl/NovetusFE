@@ -13,6 +13,12 @@ var Drive = "Z:"
 var Version = "2009E"
 var PlayerName = "Noob"
 var Map = ""
+var NewServerTexture = load("res://textures/charcustom.png")
+var NewServerTexturePath
+var NewServerIcons = []
+var ServerIndex
+var Servers 
+var serverconfig = ConfigFile.new()
 onready var WorkingDirectory = OS.get_executable_path().get_base_dir()
 
 func _ready():
@@ -58,6 +64,7 @@ func _ready():
 	$Background/Info.text = $Background/Info.text.replace("%PLAYER%",PlayerName)
 	$Background/Info.text = $Background/Info.text.replace("%CLIENT%",Version)
 	$Background/Info.text = $Background/Info.text.replace("%MAP%",Map)
+	$Main/Serverlist/Versions.text = Version
 	$Main/Menu.visible = false
 
 func customconfig(configfile):
@@ -75,13 +82,21 @@ func loadconfig(arg):
 		return
 	match arg:
 		"/NovetusFE/nfeconfig.ini":
-			for i in config.get_sections():
-				LinuxWinePrefix = config.get_value(i, "wineprefix")
-				LinuxWinePath = config.get_value(i, "wine_exec_path")
-				LinuxTerminal = config.get_value(i, "terminal")
+			LinuxWinePrefix = config.get_value("Linux Settings", "wineprefix")
+			LinuxWinePath = config.get_value("Linux Settings", "wine_exec_path")
+			LinuxTerminal = config.get_value("Linux Settings", "terminal")
+			NewServerIcons = config.get_value("General Settings", "savedicons")
+			for i in $Main/AddServerWindow/ScrollContainer/HBoxContainer.get_children():
+				if i is TextureButton:
+					i.queue_free()
+			for i in NewServerIcons:
+				imageadd(i)
 			$"Main/Settings/Linux Settings/Panel/WPBox".text = LinuxWinePrefix
 			$"Main/Settings/Linux Settings/Panel/WPBox2".text = LinuxWinePath
 			$"Main/Settings/Linux Settings/Panel/CheckBox".pressed = LinuxTerminal
+		"/NovetusFE/servers.ini":
+			for i in config.get_sections():
+				$Main/Serverlist/ItemList.add_item(i,pathtoimage(config.get_value(i,"icon","res://textures/charcustom.png")))
 
 func main_item_activated(index):
 	match $Main/Menu/ItemList.get_item_text(index):
@@ -154,13 +169,16 @@ func Back_pressed():
 
 
 func _on_Save_pressed():
+	saveconfig()
+
+func saveconfig():
 	var config = ConfigFile.new()
 	config.set_value("Linux Settings", "wineprefix", $"Main/Settings/Linux Settings/Panel/WPBox".text)
 	config.set_value("Linux Settings", "wine_exec_path", $"Main/Settings/Linux Settings/Panel/WPBox2".text)
 	config.set_value("Linux Settings", "terminal", $"Main/Settings/Linux Settings/Panel/CheckBox".pressed)
+	config.set_value("General Settings", "savedicons", NewServerIcons)
 	config.save(WorkingDirectory + "/NovetusFE/nfeconfig.ini")
 	if CTheme != null: get_tree().change_scene_to(CTheme)
-
 
 func _on_ThemeButton_pressed():
 	pass # Replace with function body.
@@ -205,6 +223,7 @@ func versionslist_activated(index):
 	$Background/Info.text = "Hello, %PLAYER%! Client Selected: %CLIENT%, Map Selected: %MAP%"
 	$Background/Info.text = $Background/Info.text.replace("%PLAYER%",PlayerName)
 	$Background/Info.text = $Background/Info.text.replace("%CLIENT%",Version)
+	$Main/Serverlist/Versions.text = Version
 	$Background/Info.text = $Background/Info.text.replace("%MAP%",$Main/Maps.current_file)
 
 func studio_item_activated(index):
@@ -254,12 +273,13 @@ func _on_Maps_confirmed():
 
 
 func DirectConnect_Join_pressed():
-	var ip = $Main/DirectConnectWindow/LineEdit.text.split(":")[0].to_ascii().get_string_from_ascii()
-	var port = $Main/DirectConnectWindow/LineEdit.text.split(":")[1].to_ascii().get_string_from_ascii()
-	var uri = Marshalls.utf8_to_base64(ip) + "|" + Marshalls.utf8_to_base64(port) + "|" + Marshalls.utf8_to_base64(Version)
-	uri = Marshalls.utf8_to_base64(uri)
+	var uri = to_uri($Main/DirectConnectWindow/LineEdit.text.split(":")[0].to_ascii().get_string_from_ascii(),$Main/DirectConnectWindow/LineEdit.text.split(":")[1].to_ascii().get_string_from_ascii())
 	launch("/bin/NovetusURI.exe novetus://" + uri)
 
+func to_uri(ip, port):
+	var uri = Marshalls.utf8_to_base64(ip) + "|" + Marshalls.utf8_to_base64(port) + "|" + Marshalls.utf8_to_base64(Version)
+	uri = Marshalls.utf8_to_base64(uri)
+	return uri
 
 func _on_DirectConnect_pressed():
 	$Main/DirectConnectWindow.popup()
@@ -267,7 +287,9 @@ func _on_DirectConnect_pressed():
 func multiplayert_item_activated(index):
 	match $Main/Multiplayer/ItemList.get_item_text(index):
 		"Join":
-			$Main/DirectConnectWindow.popup()
+			#$Main/DirectConnectWindow.popup()
+			$Main/Serverlist.popup()
+			refreshserverlist()
 		"Back":
 			menu("")
 
@@ -277,3 +299,102 @@ func DirectConnect_Close_pressed():
 
 func Firsttime_Button_pressed():
 	$Main/Menu.visible = true
+
+
+func _on_AddServer_pressed():
+	$Main/AddServerWindow.popup()
+
+func new_icon_pressed():
+	$Main/AddServerWindow/ImageSelect.current_dir = WorkingDirectory
+	$Main/AddServerWindow/ImageSelect.popup()
+
+func _on_ImageSelect_file_selected(path):
+	NewServerIcons.append(path)
+	imageadd(path)
+
+func imageadd(path):
+	NewServerTexturePath = path
+	var t = TextureButton.new()
+	t.texture_normal = pathtoimage(path,[56,56])
+	$Main/AddServerWindow/ScrollContainer/HBoxContainer.add_child(t)
+	NewServerTexture = t.texture_normal
+	t.connect("pressed",self,"icon_pressed",[t.texture_normal,t])
+
+func pathtoimage(path,resize=null):
+	var img = Image.new()
+	var err = img.load(path)
+	if(err != 0):
+		print("error loading the image")
+		return null
+	if resize != null:
+		img.resize(resize[0],resize[1])
+	var img_tex = ImageTexture.new()
+	img_tex.create_from_image(img)
+	return img_tex
+
+func icon_pressed(icon,node):
+	NewServerTexture = icon
+	for i in $Main/AddServerWindow/ScrollContainer/HBoxContainer.get_children():
+		if i is TextureButton:
+			i.modulate = Color("707070")
+	node.modulate = Color("ffffff")
+	print("pressed")
+
+func AddServer_Close_pressed():
+	$Main/AddServerWindow.visible = false
+
+
+func _on_Add_Server_pressed():
+	if $Main/AddServerWindow/LineEdit.text == "": return
+	saveconfig()
+	addtoserverlist($Main/AddServerWindow/LineEdit2.text,NewServerTexture)
+	
+func refreshserverlist():
+	$Main/Serverlist/ItemList.clear()
+	loadconfig("/NovetusFE/servers.ini")
+
+func addtoserverlist(servername, icon):
+	if f.file_exists(WorkingDirectory + "/NovetusFE/servers.ini"):
+		serverconfig.load(WorkingDirectory + "/NovetusFE/servers.ini")
+	#var uri = to_uri($Main/AddServerWindow/LineEdit.text.split(":")[0].to_ascii().get_string_from_ascii(),$Main/AddServerWindow/LineEdit.text.split(":")[1].to_ascii().get_string_from_ascii())
+	var port
+	if ":" in $Main/AddServerWindow/LineEdit.text:
+		port = $Main/AddServerWindow/LineEdit.text.split(":")[1].to_ascii().get_string_from_ascii()
+	else:
+		port = "53640"
+	var ip = $Main/AddServerWindow/LineEdit.text.split(":")[0].to_ascii().get_string_from_ascii()
+	#var port = $Main/AddServerWindow/LineEdit.text.split(":")[1].to_ascii().get_string_from_ascii()
+	#serverconfig.set_value(servername, "uri", "novetus://" + uri)
+	serverconfig.set_value(servername, "ip", ip)
+	serverconfig.set_value(servername, "port", port)
+	serverconfig.set_value(servername, "icon", NewServerTexturePath)
+	serverconfig.save(WorkingDirectory + "/NovetusFE/servers.ini")
+	refreshserverlist()
+	#$Main/Serverlist/ItemList.add_item(servername,icon)
+	
+	#print($Main/Serverlist/ItemList.items[servername])
+
+
+func mplist_item_selected(index):
+	$Main/Serverlist/Join.disabled = false
+	$Main/Serverlist/Edit.disabled = false
+	ServerIndex = index
+
+
+func _on_Join_pressed():
+	$Overlay.visible = true
+	yield(get_tree().create_timer(1),"timeout")
+	var e = $Main/Serverlist/ItemList.get_item_text(ServerIndex)
+	serverconfig.load(WorkingDirectory + "/NovetusFE/servers.ini")
+	launch("/bin/NovetusURI.exe " + to_uri(serverconfig.get_value(e,"ip"),serverconfig.get_value(e,"port")))
+	$Overlay.visible = false
+	
+
+
+func multi_Versions_pressed():
+	$Main/Serverlist/Versions.text = Version
+	$Main/VersionsWindow.popup()
+
+
+func multi_closed():
+	$Main/Serverlist.visible = false
